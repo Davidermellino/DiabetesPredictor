@@ -1,0 +1,6 @@
+name: ML_project
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - tkinter

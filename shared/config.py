@@ -1,0 +1,6 @@
+#-----COSTANTI DI CONFIGURAZIONE-----#
+
+WINDOW_TITLE = "DiabetesPredictor"
+WINDOW_SIZE = "1100x620"
+WINDOW_POSITION = "+50+50"
+ICON_PATH = "assets/logo.ico"
