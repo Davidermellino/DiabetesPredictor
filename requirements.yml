@@ -4,3 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - tkinter
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
