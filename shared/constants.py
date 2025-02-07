@@ -4,3 +4,5 @@ FEATURES_NAME = ['Diabetes_012', 'HighBP', 'HighChol', 'CholCheck', 'BMI', 'Smok
        'HvyAlcoholConsump', 'AnyHealthcare', 'NoDocbcCost', 'GenHlth',
        'MentHlth', 'PhysHlth', 'DiffWalk', 'Sex', 'Age', 'Education',
        'Income']
+
+CLASSIFIERS = ['DecisionTree', 'RandomForest ( custom )', 'KNN ( custom )', 'Artificial Neural Network', 'Naive Bayes']

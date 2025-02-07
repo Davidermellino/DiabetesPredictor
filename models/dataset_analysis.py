@@ -1,50 +1,16 @@
 import pandas as pd
-import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+from shared.utils import load_dataset, recast_features
 
 class DatasetAnalyzer:
     def __init__(self):
-        self.dataset = self._load_dataset() #Carica il dataset
+        self.dataset = recast_features(load_dataset()) #Carica il dataset
         self.features = self.dataset.iloc[:, 1:] #Salva una matrix con tutti gli attributi
         self.label = self.dataset.iloc[:, 0] #Salva un array con le Labeò
-    
-    def _load_dataset(self):
-        df = pd.read_csv("diabetes_012_health_indicators_BRFSS2015.csv", encoding="UTF-8")
         
-        return self._recast_features(df)
-        
-            
-    def _recast_features(self, df):
-        
-        df.GenHlth = df.GenHlth.astype(str)
-        df.Sex = df.Sex.astype(str)
 
-        df.loc[df.GenHlth == 5, "GenHlth"] = "poor"
-        df.loc[df.GenHlth == 4, "GenHlth"] = "fair"
-        df.loc[df.GenHlth == 3, "GenHlth"] = "good"
-        df.loc[df.GenHlth == 2, "GenHlth"] = "veryGood"
-        df.loc[df.GenHlth == 1, "GenHlth"] = "excellent"
-
-        df.loc[df.Sex == 0, "Sex"] = "F"
-        df.loc[df.Sex == 1, "Sex"] = "M"
-
-
-        df.Diabetes_012 = df.Diabetes_012.astype(int)
-        df.HighBP = df.HighBP.astype(int)
-        df.HighChol = df.HighChol.astype(int)
-        df.CholCheck = df.CholCheck.astype(int)
-        df.Smoker = df.Smoker.astype(int)
-        df.Stroke = df.Stroke.astype(int)
-        df.HeartDiseaseorAttack = df.HeartDiseaseorAttack.astype(int)
-        df.PhysActivity = df.PhysActivity.astype(int)
-        df.Fruits = df.Fruits.astype(int)
-        df.Veggies = df.Veggies.astype(int)
-        df.HvyAlcoholConsump = df.HvyAlcoholConsump.astype(int)
-        df.AnyHealthcare = df.AnyHealthcare.astype(int)
-        df.NoDocbcCost = df.NoDocbcCost.astype(int)
-        df.DiffWalk = df.DiffWalk.astype(int)
-        
-        return df
     
     def _compute_shape(self):
         
@@ -75,6 +41,26 @@ class DatasetAnalyzer:
             "numbero of peaple with diabetes": numc2
         }
     
+    def _compute_missing_values_feature(self, feature):
+        
+        return self.dataset[feature].isna().sum()
+    
+    def compute_feature_statistics(self, feature):
+        dic = {}
+        
+        for key, element in self.dataset[feature].describe().items():
+            dic[key] = element
+
+        dic["missing values"] = self._compute_missing_values_feature(feature)
+
+        return dic
+
+    def compute_missing_values_dataset(self):
+       
+        missing_values = self.dataset.isna().sum().sum()
+        return missing_values
+    
+    
     def compute_feature_data(self, feature):
     
         return self.dataset[feature]
@@ -82,7 +68,16 @@ class DatasetAnalyzer:
     
     def compute_correlation_matrix(self):
        
-        return self.features.corr()
+        #TRASFOMO I DATI IN NUMERI
+        le_sex = LabelEncoder()
+        le_genhlth = LabelEncoder()
+
+        dataset_copy = self.dataset.copy()
+        
+        dataset_copy["Sex"] = le_sex.fit_transform(dataset_copy["Sex"])  # 'F' -> 0, 'M' -> 1
+        dataset_copy["GenHlth"] = le_genhlth.fit_transform(dataset_copy["GenHlth"])  # Ordina da 'excellent' a 'poor'
+
+        return dataset_copy.iloc[:, 1:].corr()
 
                 
     
