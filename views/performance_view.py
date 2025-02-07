@@ -2,7 +2,16 @@ from tkinter import ttk
 from matplotlib import pyplot as plt
 import seaborn as sns
 
-from models.Knn_train import KnnTrain
+from models.Train_classifier import TrainClassifier
+
+#----IMPORT I MODELLI
+from models.classifiers.Knn_Custom import KnnCustom
+from models.classifiers.Decision_tree_sklearn import DecisionTreeSklearn
+from models.classifiers.Naive_bayes_sklearn import NaiveBayesSklearn
+from models.classifiers.Artificial_neural_network_sklearn import ArtificialNeuralNetworkSklearn
+from models.classifiers.Random_forest_custom import RandomForestCustom
+
+
 from shared.utils import get_accuracy, get_confusion_matrix, get_other_metrics
 
 
@@ -26,30 +35,33 @@ class PerformanceView():
        
         
     def show_metrics(self):
+        
+        
         # --------------CALCOLO METRICHE IN BASE AL CLASSIFICATORE ------------
         if self.classifier == "KNN ( custom )":
-            knn = KnnTrain()
-            predicted = knn.train_knn()
-            self.accuracy = get_accuracy(knn.test_y, predicted)
-            self.metrics = get_other_metrics(knn.test_y, predicted)
-            self.confusion_matrix = get_confusion_matrix(knn.test_y, predicted)
+            cls = KnnCustom(k=23)
         
         if self.classifier == "DecisionTree":
-            pass
+            cls = DecisionTreeSklearn()
     
         if self.classifier == "RandomForest ( custom )":
-            pass
+            cls = RandomForestCustom()
         
         if self.classifier == "Artificial Neural Network":
-            pass
+            cls = ArtificialNeuralNetworkSklearn()
         
         if self.classifier == "Naive Bayes":
-            pass
+            cls = NaiveBayesSklearn()
         
         if self.metrics_frame:
             self.metrics_frame.destroy()
         
        
+        train_classifier = TrainClassifier(cls)
+        predicted = train_classifier.train()
+        self.accuracy = get_accuracy(train_classifier.test_y, predicted)
+        self.metrics = get_other_metrics(train_classifier.test_y, predicted)
+        self.confusion_matrix = get_confusion_matrix(train_classifier.test_y, predicted)
         
         # --------------MOSTRO ACCURATEZZA ------------
         accuracy_label = ttk.Label(self.parent, 

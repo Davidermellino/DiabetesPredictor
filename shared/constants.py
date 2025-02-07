@@ -5,4 +5,6 @@ FEATURES_NAME = ['Diabetes_012', 'HighBP', 'HighChol', 'CholCheck', 'BMI', 'Smok
        'MentHlth', 'PhysHlth', 'DiffWalk', 'Sex', 'Age', 'Education',
        'Income']
 
+PREPROCESSING_NAME = ['Sampling', 'Balancing', 'Feature Selection', 'Scaling']
+
 CLASSIFIERS = ['DecisionTree', 'RandomForest ( custom )', 'KNN ( custom )', 'Artificial Neural Network', 'Naive Bayes']
