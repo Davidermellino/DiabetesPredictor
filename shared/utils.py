@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
+from sklearn.model_selection import train_test_split
 
 
 def clear_content(frame):
@@ -70,3 +71,7 @@ def get_other_metrics(test_y, predicted):
 def get_confusion_matrix(test_y, predicted):
     return multilabel_confusion_matrix(test_y, predicted)
 
+
+def stratifiedSplit(self, feature, labels):
+        train_x, test_x, train_y, test_y = train_test_split(feature, labels, random_state=0, test_size=0.3, stratify=labels)
+        return train_x, test_x, train_y, test_y
