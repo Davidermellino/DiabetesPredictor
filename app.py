@@ -7,6 +7,7 @@ from views.home_view import HomeView
 from views.dataset_analysis_view import DatasetAnalysisView
 from views.classifiers_view import ClassifiersView
 from views.comparisons_view import ComparisonsView
+from views.compare_all_models_view import CompareAllModelsView
 
 #IMPORTAZIONE DELLE VARIAIBILI GLOBALI ( Solo quelle che servono )
 from shared.config import WINDOW_TITLE, WINDOW_SIZE, WINDOW_POSITION, ICON_PATH
@@ -49,14 +50,12 @@ class MainApp:
             "dataset analysis": self.show_dataset_analysis_page,
             "classifiers": self.show_classifiers_page,
             "comparisons": self.show_comparisons_page,
+            "compare all models":self.show_compare_all_page,
         }
         
         for page, command in buttons.items(): #crea un bottone per ogni item nel dizionario e gli assegna l'azione command
             
             button = ttk.Button(self.sidebar, text=page, style="Title.TButton", command=command)
-            
-            if page == "comparisons":
-                button.state(["disabled"])
                 
             button.pack(side=TOP, fill=X, padx=10, pady=10)
         
@@ -77,6 +76,11 @@ class MainApp:
         
     
     def show_comparisons_page(self):
-        self._clear_content(self.content_area)
+        clear_content(self.content_area)
         ComparisonsView(self.content_area)
+    
+    
+    def show_compare_all_page(self):
+        clear_content(self.content_area)
+        CompareAllModelsView(self.content_area)
         

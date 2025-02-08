@@ -17,14 +17,15 @@ from shared.utils import get_accuracy, get_confusion_matrix, get_other_metrics
 
 class PerformanceView():
     
-    def __init__(self, parent, classifier):
+    def __init__(self, parent, classifier, preprocessing = None, show_plot=False):
         self.parent = parent
         self.classifier = classifier
+        self.preprocessing = preprocessing
         self.accuracy = None
         self.confusion_matrix = None
         self.metrics = None
         self.metrics_frame = None
-    
+        self.show_plot = show_plot
         self._create_widgets()
         self.show_metrics()
         
@@ -57,7 +58,8 @@ class PerformanceView():
             self.metrics_frame.destroy()
         
        
-        train_classifier = TrainClassifier(cls)
+        train_classifier = TrainClassifier(cls, self.preprocessing)
+      
         predicted = train_classifier.train()
         self.accuracy = get_accuracy(train_classifier.test_y, predicted)
         self.metrics = get_other_metrics(train_classifier.test_y, predicted)
@@ -97,7 +99,7 @@ class PerformanceView():
             ttk.Label(right_frame, text=f"Recall: {class_metrics['recall']:.4f}").pack(anchor='w')
             ttk.Label(right_frame, text=f"F1-Score: {class_metrics['f1_score']:.4f}").pack(anchor='w')
         
-        self.plot_confusion_matrix()
+        if self.show_plot: self.plot_confusion_matrix()
         
     def plot_confusion_matrix(self):
         # Ottieni la matrice di confusione
@@ -106,6 +108,8 @@ class PerformanceView():
         # Per ogni label, crea un subplot
         num_labels = cm.shape[0]
         fig, axes = plt.subplots(1, num_labels, figsize=(15, 5))
+        
+        fig.canvas.manager.set_window_title(f"Confusion Matrix {self.classifier}")
 
         for i in range(num_labels):
             sns.heatmap(cm[i], annot=True, fmt='d', cmap='Blues', cbar=False, ax=axes[i])

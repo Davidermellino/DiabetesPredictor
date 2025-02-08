@@ -3,14 +3,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from shared.utils import load_dataset, recast_features
+from models.preprocessing.Sampler import Sampler
+from models.preprocessing.Scaler import Scaler
+from models.preprocessing.FeatureSelection import FeatureSelection
 
 class DatasetAnalyzer:
     def __init__(self):
-        self.dataset = recast_features(load_dataset()) #Carica il dataset
+        self.dataset = load_dataset() #Carica il dataset
         self.features = self.dataset.iloc[:, 1:] #Salva una matrix con tutti gli attributi
         self.label = self.dataset.iloc[:, 0] #Salva un array con le Labeò
         
+        sampler = Sampler(self.features, self.label) #Applica il Random Undersampling
+        self.features, self.label = sampler.randomSampler(self.features, self.label)
+        
+        self.dataset = recast_features(pd.concat([self.label, self.features], axis=1))
 
+        # scaler = Scaler(self.features)
+        # self.features = scaler.MinMaxScale(self.features)
+        
+        # feature_selection = FeatureSelection(self.features, self.label)
+        # self.features = feature_selection.featureSelection_Chi2(self.features, self.label)
     
     def _compute_shape(self):
         
@@ -30,7 +42,7 @@ class DatasetAnalyzer:
         
         #Inizalizzo variabili
         numc0, numc1, numc2 = self._compute_shape()
-        num_records = self.dataset.shape[0]
+        num_records = self.features.shape[0]
         num_features = self.features.shape[1]
         
         return {

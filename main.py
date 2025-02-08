@@ -31,3 +31,8 @@ if __name__ == "__main__":
     root = Tk()
     app = MainApp(root)
     root.mainloop()
+
+#TODO:
+#TUNING
+#miglior combinazione
+#

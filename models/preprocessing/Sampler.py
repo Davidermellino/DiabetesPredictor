@@ -1,24 +1,6 @@
 from imblearn.over_sampling import RandomOverSampler, SMOTE, ADASYN 
-from imblearn.under_sampling import RandomUnderSampler, InstanceHardnessThreshold, NearMiss, ClusterCentroids
-# from models.preprocessing.combination_under_over import under_50, over_50, modelsAccuracy
-
-
-#-------SOLUZIONE DI DEEPSEEK-------
-# class Sampler:
-#     def __init__(self):
-#         self.techniques = {
-#             "rus": RandomUnderSampler(),
-#             "nm1": NearMiss(version=1),
-#             "nm2": NearMiss(version=2),
-#             "ros": RandomOverSampler(),
-#             "smote": SMOTE(),
-#             "adasyn": ADASYN()
-#         }
-
-#     def apply(self, X, y, technique):
-#         if technique not in self.techniques:
-#             raise ValueError(f"Tecnica non supportata: {technique}")
-#         return self.techniques[technique].fit_resample(X, y)
+from imblearn.under_sampling import RandomUnderSampler, NearMiss
+from sklearn.model_selection import train_test_split
 
 class Sampler:
     def __init__(self, train_x, train_y):
@@ -26,7 +8,10 @@ class Sampler:
         self.train_x = train_x
         self.train_y = train_y
         
-        
+    
+    def stratifiedSplit(self, feature, labels):
+        train_x, test_x, train_y, test_y = train_test_split(feature, labels, random_state=0, test_size=0.3, stratify=labels)
+        return train_x, test_x, train_y, test_y
     #?-----------UNDERSAMPLING----------------
         
     def randomSampler(self, train_x, train_y):

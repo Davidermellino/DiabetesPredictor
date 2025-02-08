@@ -27,5 +27,6 @@ class ClassifiersView:
     def show_performance_page(self):
         choice = self.classifier_choice.get()
         clear_content(self.parent)
-        PerformanceView(self.parent, choice)
+
+        PerformanceView(self.parent, choice, preprocessing=None, show_plot=True)
             
