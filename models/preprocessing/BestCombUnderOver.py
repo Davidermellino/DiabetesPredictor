@@ -22,13 +22,14 @@ class CombinationUnderOver:
         best_under , best_over = self.best_combination()
         print(f"UNDER {best_under},OVER {best_over}")
 
+        #lo preprocesso con la combinazione con prestazioni migliori 
         under_processed_x, under_processed_y = self.under_50(best_under, self.data_x, self.labels_y)
         over_processed_x, over_processed_y = self.over_50(best_over, under_processed_x, under_processed_y)
                
         return over_processed_x, over_processed_y
         
    
-    def under_50(self, method, data_x, labels_y):
+    def under_50(self, method, data_x, labels_y): #fa l'undersampling con il metodo scelto
         
         sampler = Sampler(data_x, labels_y)
         
@@ -43,7 +44,7 @@ class CombinationUnderOver:
  
         return processed_x, processed_y
  
-    def over_50(self, method, data_x, labels_y):
+    def over_50(self, method, data_x, labels_y):#fa l'pversampling con il metodo scelto
         
         sampler = Sampler(data_x, labels_y)
  
@@ -61,11 +62,12 @@ class CombinationUnderOver:
  
 
 
-    def best_combination(self):
-        tecniche_undersampling = ["RandomUnderSampling",
+    def best_combination(self): #cerca la migliore combinazione
+      
+        methods_undersampling = ["RandomUnderSampling",
                                     "NearMiss",
                                     "NearMiss2"]
-        tecniche_oversampling = ["RandomOverSampling",
+        methods_oversampling = ["RandomOverSampling",
                                     "SMOTE",
                                     "ADASYN"]
    
@@ -73,30 +75,27 @@ class CombinationUnderOver:
         best_combination_over = ""
         best_combination_under = ""
  
-        for under in tecniche_undersampling:
-            for over in tecniche_oversampling:
-                under_processed_x, under_processed_y = self.under_50(under, self.data_x, self.labels_y)
-                over_processed_x, over_processed_y = self.over_50(over, under_processed_x, under_processed_y)
+        for under in methods_undersampling: #per ogni metodo di undersampling
+            for over in methods_oversampling: #per ogni metodo di oversampling
+                under_processed_x, under_processed_y = self.under_50(under, self.data_x, self.labels_y) #preprocesso il dataset con undersampling
+                over_processed_x, over_processed_y = self.over_50(over, under_processed_x, under_processed_y) #preprocesso il dataset con oversampling
                
+                #split del dataset
                 train_x, test_x, train_y, test_y = train_test_split(over_processed_x, over_processed_y, random_state=0, test_size=0.25, stratify=over_processed_y)
- 
-                accuracy = self.modelsAccuracy(train_x, train_y, test_x, test_y)
+
+                accuracy = self.modelsAccuracy(train_x, train_y, test_x, test_y) #calcolo dell'accuratezza 
                
-                if accuracy > best_combination_accuracy:
+                if accuracy > best_combination_accuracy: #ricerca dell'accuratezza migliore
                     best_combination_accuracy = accuracy
                     best_combination_over = over
                     best_combination_under = under
        
 
-        return best_combination_under, best_combination_over 
-        
-
-
-
+        return best_combination_under, best_combination_over # restiusce la migliore tecnica di under e di over
 
     def modelsAccuracy(self, train_x, train_y, test_x, test_y):
         
-            if self.model == "DecisionTree":
+            if self.model == "DecisionTree":#best UNDER NearMiss2, OVER RandomOverSampling
                 dt = DecisionTreeSklearn()
                 dt.fit(train_x, train_y)
                 pred_y = dt.predict(test_x)
@@ -112,7 +111,7 @@ class CombinationUnderOver:
                 pred_y = aan.predict(test_x)
                 
             #DA RIVEDERE I CUSTOM
-            elif self.model == "KNN":
+            elif self.model == "KNN": #best UNDER NearMiss2, OVER RandomOverSampling
                 knn_custom = KnnCustom()
                 knn_custom.fit(train_x, train_y)
                 pred_y = knn_custom.predict(test_x)

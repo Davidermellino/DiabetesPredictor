@@ -10,6 +10,7 @@ from models.preprocessing.Scaler import Scaler
 
 from models.preprocessing.BestCombUnderOver import CombinationUnderOver
 
+from models.preprocessing.BestPreProccessingCombination import BestPreProcComb
 class TrainClassifier:
 
     def __init__(self, classifier, preprocessing=None):
@@ -18,13 +19,17 @@ class TrainClassifier:
         self.preprocessing = preprocessing
 
         #Inizializzo il dataset
-        self.dataset = load_dataset() #Carica il dataset       
-        dim = 10000 if classifier.name == "KNN" or classifier.name == "RandomForest" else self.dataset.shape[0]
-        self.train_x, self.test_x, self.train_y, self.test_y = None,None,None,None
+        self.dataset = load_dataset() #Carica il dataset 
      
         #divido labels e features
-        self.features = self.dataset.iloc[:dim, 1:] #Salva una matrix con tutti gli attributi
-        self.label = self.dataset.iloc[:dim, 0] #Salva un array con le Label
+        self.features = self.dataset.iloc[:, 1:] #Salva una matrix con tutti gli attributi
+        self.label = self.dataset.iloc[:, 0] #Salva un array con le Label
+
+        if classifier.name == "KNN"  or classifier.name == "RandomForest":
+            under_processer = Sampler(self.features, self.label)
+            self.features, self.label = under_processer.nearMissSampler(self.features, self.label)
+       
+        self.train_x, self.test_x, self.train_y, self.test_y = None,None,None,None
 
  #---------------SPLIT DEL DATASET-------------------
 
@@ -36,7 +41,7 @@ class TrainClassifier:
  
         #NO PREPROCESSING
         elif self.preprocessing is None:
-            self.train_x, self.test_x, self.train_y, self.test_y = train_test_split(self.features, self.label, random_state=0, test_size=0.25)
+            self.train_x, self.test_x, self.train_y, self.test_y = train_test_split(self.features, self.label, random_state=0, test_size=0.25, stratify=self.label)
 
        
 
@@ -67,14 +72,18 @@ class TrainClassifier:
             selected_x = feature_selector.featureSelection_Chi2(data_x, labels)
             return selected_x, labels
 
- 
 
         elif preprocessor_choice == "Scaling":
             scaler = Scaler(data_x)
             scaled_x = scaler.MinMaxScale(data_x)
             return scaled_x, labels
 
-   
+        elif preprocessor_choice == "Best Combination":
+
+            preprocessor = BestPreProcComb(classifier=self.classifier.name, features=data_x,labels=labels)
+            preprocessed_x, preprocessed_y = preprocessor.preproc_best()
+            return preprocessed_x, preprocessed_y
+
 
     def stratified_sampling(self):
 
