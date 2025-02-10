@@ -10,7 +10,8 @@ from models.classifiers.Decision_tree_sklearn import DecisionTreeSklearn
 from models.classifiers.Naive_bayes_sklearn import NaiveBayesSklearn
 from models.classifiers.Artificial_neural_network_sklearn import ArtificialNeuralNetworkSklearn
 from models.classifiers.Random_forest_custom import RandomForestCustom
-
+from shared.utils import load_dataset
+from models.preprocessing.Sampler import Sampler
 
 from shared.utils import get_accuracy, get_confusion_matrix, get_other_metrics
 
@@ -26,6 +27,12 @@ class PerformanceView():
         self.metrics = None
         self.metrics_frame = None
         self.show_plot = show_plot
+
+        #PER TUNING
+        self.dataset = load_dataset()
+        self.features = self.dataset.iloc[:, 1:] #Salva una matrix con tutti gli attributi
+        self.label = self.dataset.iloc[:, 0] #Salva un array con le Label
+
         self._create_widgets()
         self.show_metrics()
         
@@ -40,16 +47,40 @@ class PerformanceView():
         
         # --------------CALCOLO METRICHE IN BASE AL CLASSIFICATORE ------------
         if self.classifier == "KNN ( custom )":
-            cls = KnnCustom(k=23)
-        
+            best_k = 17
+            #------PER TUNING-------
+            # under_processer = Sampler(self.features, self.label)
+            # self.features, self.label = under_processer.nearMissSampler(self.features, self.label)
+            # cls = KnnCustom()
+            # best_k = cls.tuning_k_weights(self.features, self.label , weights = True) #metti False se non vuoi usare i pesi 
+            
+            cls = KnnCustom(k=best_k)
+
         if self.classifier == "DecisionTree":
+            
+            best_depth=11
+            #------PER TUNING-------
             cls = DecisionTreeSklearn()
+            best_depth = cls.tuning_hyperparameters(self.features,self.label)
+           
+            cls = DecisionTreeSklearn(max_depth=best_depth)
     
         if self.classifier == "RandomForest ( custom )":
-            cls = RandomForestCustom()
+            best_n_tree = 17
+            #------PER TUNING-------
+            # under_processer = Sampler(self.features, self.label)
+            # self.features, self.label = under_processer.nearMissSampler(self.features, self.label)
+            # cls = RandomForestCustom()
+            # best_n_tree = cls.tuning_hyperparameters(self.features, self.label)
+            
+            cls = RandomForestCustom(n_estimators=best_n_tree)
         
         if self.classifier == "Artificial Neural Network":
+            best_layers = (32,32)
+            #------PER TUNING-------
             cls = ArtificialNeuralNetworkSklearn()
+            best_layers = cls.tuning_hidden_layers(self.features,self.label)
+            cls = ArtificialNeuralNetworkSklearn(hidden_layer_sizes=best_layers)
         
         if self.classifier == "Naive Bayes":
             cls = NaiveBayesSklearn()
@@ -66,9 +97,7 @@ class PerformanceView():
         self.confusion_matrix = get_confusion_matrix(train_classifier.test_y, predicted)
         
         # --------------MOSTRO ACCURATEZZA ------------
-        accuracy_label = ttk.Label(self.parent, 
-                                 text=f"Overall Accuracy: {self.accuracy:.4f}", 
-                                 style="Title.TLabel")
+        accuracy_label = ttk.Label(self.parent, text=f"Overall Accuracy: {self.accuracy:.4f}", style="Title.TLabel")
         accuracy_label.pack(pady=5)
         
         

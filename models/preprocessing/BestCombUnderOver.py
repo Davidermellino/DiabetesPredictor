@@ -100,12 +100,12 @@ class CombinationUnderOver:
                 dt.fit(train_x, train_y)
                 pred_y = dt.predict(test_x)
         
-            elif self.model == "GaussianNB":
+            elif self.model == "GaussianNB": #UNDER NearMiss2,OVER RandomOverSampling
                 nb = NaiveBayesSklearn()
                 nb.fit(train_x, train_y)
                 pred_y = nb.predict(test_x)
     
-            elif self.model == "ArtificialNeuralNetwork":
+            elif self.model == "ArtificialNeuralNetwork": #UNDER NearMiss2,OVER RandomOverSampling
                 aan = ArtificialNeuralNetworkSklearn()
                 aan.fit(train_x, train_y)
                 pred_y = aan.predict(test_x)

@@ -27,7 +27,7 @@ class BestPreProcComb ():
     def preproc_best(self):
         best_combo, X_preprocessed, y_preprocessed = self.find_best()
         
-        #print("MIGLIORE COMBINAZIONE" , best_combo)
+        print("MIGLIORE COMBINAZIONE" , best_combo)
 
         return X_preprocessed, y_preprocessed
     
@@ -37,7 +37,7 @@ class BestPreProcComb ():
 
         # crea tutte le combinazioni di 1, 2 e 3 tecniche
         all_combinations = []
-        best_combination_accuracy = 1
+        best_combination_accuracy = 0
         best_combination = None
         best_X, best_y = self.features, self.labels
 
@@ -76,7 +76,10 @@ class BestPreProcComb ():
            
         elif preprocessor_choice == "Best_Under_Over":
             balancer = CombinationUnderOver(data_x,labels, model = self.classifier)
-            balanced_x, balanced_y = balancer.combination_Under_Over()
+           
+            #utilizzo questi perchè sono per tutti i migliori
+            balanced_x, balanced_y = balancer.under_50("NearMiss2",data_x, labels)
+            balanced_x, balanced_y = balancer.over_50("RandomOverSampling",balanced_x, balanced_y)
             return balanced_x, balanced_y
 
 

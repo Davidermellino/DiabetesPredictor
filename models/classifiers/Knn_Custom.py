@@ -4,7 +4,12 @@ from imblearn.under_sampling import NearMiss
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-class KnnCustom:
+#per il tuning
+import matplotlib.pyplot as plt
+from sklearn.model_selection import cross_validate
+from sklearn.base import BaseEstimator, ClassifierMixin
+
+class KnnCustom(BaseEstimator, ClassifierMixin):
 
     def __init__(self, k = 17, weights = False):
         #usiamo di default k = 17 e weights = False perche ci fa ottenere il risultato migliore nel tuning 
@@ -14,12 +19,13 @@ class KnnCustom:
         while k % 2 == 0 or k % 3 == 0: #mi assicuro che k non sia pari e non sia multiplo di 3
             k += 1
         self.k = k
-        self.w = weights
+        self.weights = weights
     
     def fit(self, features, labels):
         self.features=  features
         self.labels = labels
-    
+        
+        return self
     
     def predict(self, test_x):
         # Lista per le etichette finali
@@ -38,7 +44,7 @@ class KnnCustom:
         k_index = index_dist_sorted[:self.k].flatten()  # appiattisce l'array in 1D, e prende i primi k indici (in pos 0 ci sarà il più piccolo e così via)
         near_labels = self.labels.iloc[k_index].values.astype(int)  # Trova le k label più vicine, converto in int perchè arg max deve accetta solo interi
         
-        if (self.w): #se vengono utilizzati i pesi
+        if (self.weights): #se vengono utilizzati i pesi
 
             k_distances = distances[k_index] #vengono salvate le k distanze più piccole
 
@@ -51,51 +57,52 @@ class KnnCustom:
             prediction = np.argmax(weighted_counts)  # trova la label più dopo averlo pesato
 
         else:
-
-           # unique, counts = np.unique(near_labels, return_counts=True) #conta i voti
-            #index = counts.argmax() # estrae il voto massimo
-
             prediction = np.bincount(near_labels).argmax()
         
 
         return prediction
     
-    def tuning_k_weights(self,k,weights,stratified = True): #impostare k e se si vogliono utilizzare i pesi (weights = True/false)
-        # Applichiamo undersampling
-       
-        rus = NearMiss()
-        X, y = rus.fit_resample(self.features, self.labels)
-        print("num records", X.shape[0])
+    def tuning_k_weights(self, X, y , weights):
 
-        # Train-test split
-        if stratified: #SPLIT STRATIFICATO
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42,stratify= y)
-        else: #SPLIT NON STRATIFICATO
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        # Lista per memorizzare i valori di k e le rispettive accuracy
+        
+        # Liste per memorizzare i valori
         k_values = []
-        accuracies = []
-
+        acc_train = []
+        acc_val = []
+        
         for k in range(1, 50):
             if k % 2 == 0 or k % 3 == 0:
                 continue
             
+            # Creiamo il modello KNN
             knn = KnnCustom(k=k, weights=weights)
-            knn.fit(X_train, y_train)
-            acc = accuracy_score(y_test, knn.predict(X_test))
             
+            # Eseguiamo 10-fold cross-validation
+            scores = cross_validate( estimator=knn, X=X, y=y, cv=5, n_jobs=-1, return_train_score=True)
+            
+            # Calcoliamo le medie degli score
+            score_train = scores['train_score'].mean()
+            score_val = scores['test_score'].mean()
+            
+            # Stampiamo i risultati
+            print(f"k={k}, Train: {score_train:.4f}, Val: {score_val:.4f}")
+            
+            # Aggiungiamo i valori alle liste
             k_values.append(k)
-            accuracies.append(acc)
-            
-            print("k=", k, "Accuracy:", acc)
+            acc_train.append(score_train)
+            acc_val.append(score_val)
+        
 
-        # Plot dell'accuracy in funzione di k
-        plt.figure(figsize=(10, 5))
-        plt.plot(k_values, accuracies, marker='o', linestyle='dashed', color='b')
-        plt.xlabel('Valore di k')
-        plt.ylabel('Accuracy')
-        plt.title('Andamento dell\'Accuracy al variare di k')
-        plt.grid()
-        plt.show()
+        # Troviamo il miglior k basato sulla validation accuracy
+        best_k_idx = np.argmax(acc_val)
+        best_k = k_values[best_k_idx]
+        best_val_acc = acc_val[best_k_idx]
+        
+        print(f"\nMiglior k: {best_k}")
+        print(f"Miglior validation accuracy: {best_val_acc:.4f}")
+        
+        return best_k
+
+
+
 
