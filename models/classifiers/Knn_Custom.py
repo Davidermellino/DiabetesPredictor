@@ -4,12 +4,13 @@ from imblearn.under_sampling import NearMiss
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-#per il tuning
+# Per il tuning
 import matplotlib.pyplot as plt
 from sklearn.model_selection import cross_validate
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 class KnnCustom(BaseEstimator, ClassifierMixin):
+    #Le due superclassi sono utilizzae in fase di tuning per utilizzare la funzione cross_validate di sklearn
 
     def __init__(self, k = 17, weights = False):
         #usiamo di default k = 17 e weights = False perche ci fa ottenere il risultato migliore nel tuning 
@@ -24,7 +25,6 @@ class KnnCustom(BaseEstimator, ClassifierMixin):
     def fit(self, features, labels):
         self.features=  features
         self.labels = labels
-        
         return self
     
     def predict(self, test_x):
@@ -64,36 +64,32 @@ class KnnCustom(BaseEstimator, ClassifierMixin):
     
     def tuning_k_weights(self, X, y , weights):
 
-        
-        # Liste per memorizzare i valori
-        k_values = []
-        acc_train = []
-        acc_val = []
+        k_values = [] 
+        acc_train = [] # Accuracy sul training set 
+        acc_val = [] # Accuracy sul validation set
         
         for k in range(1, 50):
             if k % 2 == 0 or k % 3 == 0:
                 continue
             
-            # Creiamo il modello KNN
             knn = KnnCustom(k=k, weights=weights)
             
-            # Eseguiamo 10-fold cross-validation
+            # Esegue 10-fold cross-validation
             scores = cross_validate( estimator=knn, X=X, y=y, cv=5, n_jobs=-1, return_train_score=True)
             
-            # Calcoliamo le medie degli score
+            # Calcolo le medie degli score
             score_train = scores['train_score'].mean()
             score_val = scores['test_score'].mean()
             
-            # Stampiamo i risultati
             print(f"k={k}, Train: {score_train:.4f}, Val: {score_val:.4f}")
             
-            # Aggiungiamo i valori alle liste
+            # Aggiungo i valori alle liste
             k_values.append(k)
             acc_train.append(score_train)
             acc_val.append(score_val)
         
 
-        # Troviamo il miglior k basato sulla validation accuracy
+        # Trovo il miglior k basato sulla validation accuracy
         best_k_idx = np.argmax(acc_val)
         best_k = k_values[best_k_idx]
         best_val_acc = acc_val[best_k_idx]

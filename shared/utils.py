@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.metrics import accuracy_score, multilabel_confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 
 
@@ -14,6 +14,8 @@ def load_dataset():
             
 def recast_features(df):
         
+    # Recast dei valori delle colonne in modo da renderle più comprensibili
+    #UTILIZZATE SOLO PER LA PARTE DI DATA ANALYSIS
     df["GenHlth"] = df["GenHlth"].astype("object")
     df.loc[df.GenHlth == 5, "GenHlth"] = "poor"
     df.loc[df.GenHlth == 4, "GenHlth"] = "fair"
@@ -39,23 +41,25 @@ def get_accuracy(test_y, predicted):
         return accuracy_score(test_y, predicted)
     
 def get_other_metrics(test_y, predicted):
-    # Ottiene la matrice di confusione per ogni classe
-    conf_matrices = get_confusion_matrix(test_y, predicted)
-    # Dizionario per salvare tutte le metriche
+    # Ottiene la matrice di confusione
+    cm = get_confusion_matrix(test_y, predicted)
+    total_samples = cm.sum()
+    num_classes = cm.shape[0]
     metrics = {}
     
-    # Calcola le metriche per ogni classe
-    for i, conf_matrix in enumerate(conf_matrices):
-        # Estrae i valori dalla matrice di confusione
-        tn, fp = conf_matrix[0]
-        fn, tp = conf_matrix[1]
+    for i in range(num_classes):
+        # Calcola TP, FP, FN, TN per ogni classe
+        tp = cm[i, i]
+        fp = cm[:, i].sum() - tp
+        fn = cm[i, :].sum() - tp
+        tn = total_samples - (tp + fp + fn)
         
-        # Calcola precision, recall e f1
+        # Calcola precision, recall e F1-score
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        f1 = 2* (precision  * recall) / (precision + recall) if (precision + recall) > 0 else 0
         
-        # Salva le metriche per questa classe
+        # Salva le metriche per la classe corrente
         metrics[f'class_{i}'] = {
             'true_positives': int(tp),
             'false_positives': int(fp),
@@ -65,13 +69,8 @@ def get_other_metrics(test_y, predicted):
             'recall': round(recall, 4),
             'f1_score': round(f1, 4)
         }
-
+    
     return metrics
 
 def get_confusion_matrix(test_y, predicted):
-    return multilabel_confusion_matrix(test_y, predicted)
-
-
-def stratifiedSplit(self, feature, labels):
-        train_x, test_x, train_y, test_y = train_test_split(feature, labels, random_state=0, test_size=0.3, stratify=labels)
-        return train_x, test_x, train_y, test_y
+    return confusion_matrix(test_y, predicted, labels=[0, 1, 2])

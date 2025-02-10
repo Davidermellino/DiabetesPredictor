@@ -1,7 +1,9 @@
+#----IMPORTO LE LIBRERIE PER LA GUI
 from tkinter import ttk
 from matplotlib import pyplot as plt
-import seaborn as sns
 
+
+#----IMPORTO LA CLASSE PER IL TRAINING
 from models.Train_classifier import TrainClassifier
 
 #----IMPORT I MODELLI
@@ -10,18 +12,23 @@ from models.classifiers.Decision_tree_sklearn import DecisionTreeSklearn
 from models.classifiers.Naive_bayes_sklearn import NaiveBayesSklearn
 from models.classifiers.Artificial_neural_network_sklearn import ArtificialNeuralNetworkSklearn
 from models.classifiers.Random_forest_custom import RandomForestCustom
+
+#----IMPORT FUNIZONI PER TRAINA
 from shared.utils import load_dataset
-from models.preprocessing.Sampler import Sampler
-
 from shared.utils import get_accuracy, get_confusion_matrix, get_other_metrics
-
+from sklearn.metrics import ConfusionMatrixDisplay
 
 class PerformanceView():
     
     def __init__(self, parent, classifier, preprocessing = None, show_plot=False):
+        
         self.parent = parent
+        
+        #--------SCELTA CLASSIFICATORE E PREPROCESSING
         self.classifier = classifier
         self.preprocessing = preprocessing
+        
+        #--------VARIABILI PER LE METRICHE
         self.accuracy = None
         self.confusion_matrix = None
         self.metrics = None
@@ -29,9 +36,9 @@ class PerformanceView():
         self.show_plot = show_plot
 
         #PER TUNING
-        self.dataset = load_dataset()
-        self.features = self.dataset.iloc[:, 1:] #Salva una matrix con tutti gli attributi
-        self.label = self.dataset.iloc[:, 0] #Salva un array con le Label
+        # self.dataset = load_dataset()
+        # self.features = self.dataset.iloc[:, 1:] #Salva una matrix con tutti gli attributi
+        # self.label = self.dataset.iloc[:, 0] #Salva un array con le Label
 
         self._create_widgets()
         self.show_metrics()
@@ -60,12 +67,12 @@ class PerformanceView():
             
             best_depth=11
             #------PER TUNING-------
-            cls = DecisionTreeSklearn()
-            best_depth = cls.tuning_hyperparameters(self.features,self.label)
+            # cls = DecisionTreeSklearn()
+            # best_depth = cls.tuning_hyperparameters(self.features,self.label)
            
             cls = DecisionTreeSklearn(max_depth=best_depth)
     
-        if self.classifier == "RandomForest ( custom )":
+        if self.classifier == "RF ( custom )":
             best_n_tree = 17
             #------PER TUNING-------
             # under_processer = Sampler(self.features, self.label)
@@ -75,11 +82,11 @@ class PerformanceView():
             
             cls = RandomForestCustom(n_estimators=best_n_tree)
         
-        if self.classifier == "Artificial Neural Network":
+        if self.classifier == "ANN":
             best_layers = (32,32)
             #------PER TUNING-------
-            cls = ArtificialNeuralNetworkSklearn()
-            best_layers = cls.tuning_hidden_layers(self.features,self.label)
+            # cls = ArtificialNeuralNetworkSklearn()
+            # best_layers = cls.tuning_hidden_layers(self.features,self.label)
             cls = ArtificialNeuralNetworkSklearn(hidden_layer_sizes=best_layers)
         
         if self.classifier == "Naive Bayes":
@@ -89,8 +96,8 @@ class PerformanceView():
             self.metrics_frame.destroy()
         
        
+        #----TRAINO IL CLASSIFICATORE SCELTO E CALCOLO LE METRICHE
         train_classifier = TrainClassifier(cls, self.preprocessing)
-      
         predicted = train_classifier.train()
         self.accuracy = get_accuracy(train_classifier.test_y, predicted)
         self.metrics = get_other_metrics(train_classifier.test_y, predicted)
@@ -131,20 +138,8 @@ class PerformanceView():
         if self.show_plot: self.plot_confusion_matrix()
         
     def plot_confusion_matrix(self):
-        # Ottieni la matrice di confusione
-        cm = self.confusion_matrix
+        disp = ConfusionMatrixDisplay(confusion_matrix=self.confusion_matrix)
+        disp.plot()
+        plt.gcf().canvas.manager.set_window_title(f"Confusion Matrix {self.classifier}")
 
-        # Per ogni label, crea un subplot
-        num_labels = cm.shape[0]
-        fig, axes = plt.subplots(1, num_labels, figsize=(15, 5))
-        
-        fig.canvas.manager.set_window_title(f"Confusion Matrix {self.classifier}")
-
-        for i in range(num_labels):
-            sns.heatmap(cm[i], annot=True, fmt='d', cmap='Blues', cbar=False, ax=axes[i])
-            axes[i].set_title(f'Label {i}')
-            axes[i].set_xlabel('Predicted')
-            axes[i].set_ylabel('True')
-
-        plt.tight_layout()
         plt.show()

@@ -12,9 +12,10 @@ class ShowDatasetStatisticsView:
         label = ttk.Label(self.parent, text=f"Dataset Statistics", style="Title.TLabel")
         label.pack()
         
-        
+        # CALOCLO DEL NUMERO DI RECORD
         num_record = self.statistics["records count"]
         
+        # CALCOLO DELLE STATISTICHE
         for statistic, value in self.statistics.items():
             
             if statistic != "records count" and statistic != "features count":
@@ -24,7 +25,6 @@ class ShowDatasetStatisticsView:
                 label = ttk.Label(self.parent, text=f"{statistic}: {value}", style="Title.TLabel")
                 label.pack()
                 
+        # CALCOLO DEI VALORI MANCANTI     
         missing_value_label = ttk.Label(self.parent, text=f"Missing values: {self.missing_values}", style="Title.TLabel")
         missing_value_label.pack()
-    
-        

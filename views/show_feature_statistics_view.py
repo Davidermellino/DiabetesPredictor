@@ -15,19 +15,20 @@ class ShowFeatureStatisticsView:
         label = ttk.Label(self.parent, text=f"Statistics for {self.choice}", style="Title.TLabel")
         label.pack()
         
-        #printo tutte le statistiche     
+        # CALCOLO DELLE STATISTICHE   
         for statistic, value in self.feature_statistics.items():     
             label = ttk.Label(self.parent, text=f"{statistic}: {value}", style="Title.TLabel")
             label.pack()
 
-        if self.feature_data.dtype == "float64":  # Controlla se è di tipo float
-            #creo il subplot
+        # PLOTTA L'ISTOGRAMMA NEL CASO DI FEATURE DI TIPO int64 o int32, IL BOXPLOT E L'ISTOGRAMMA ALTRIMENTI
+        if self.feature_data.dtype == "float64": 
             self._plot_boxplot_and_histogram(self.feature_data)
         elif self.feature_data.dtype == "int64" or self.feature_data.dtype == "int32" or self.feature_data.dtype == "object":  # Controlla se è di tipo in # Controlla se è di tipo stringa (object)
             self._plot_histogram(self.feature_data)
         
     def _plot_histogram(self, feature_data):
         
+        # PLOTTA L'ISTOGRAMMA
         feature_data.value_counts().plot(kind='bar', color=['red', 'blue', 'green','purple', 'yellow'], edgecolor='black')
 
         plt.xlabel("Value")
@@ -38,6 +39,7 @@ class ShowFeatureStatisticsView:
         
     def _plot_boxplot_and_histogram(self, feature_data):
         
+        # PLOTTA IL BOXPLOT E L'ISTOGRAMMA
         plt.subplot(1, 2, 1)
         plt.boxplot(feature_data)
         plt.title(f'Boxplot di {feature_data.name}')

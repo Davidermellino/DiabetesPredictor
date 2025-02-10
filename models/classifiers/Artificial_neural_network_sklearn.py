@@ -53,7 +53,7 @@ class ArtificialNeuralNetworkSklearn:
             mlp = MLPClassifier(
                 hidden_layer_sizes=hidden_layers, 
                 max_iter=500, 
-                random_state=42
+                random_state=0
             )
             
             # Eseguiamo 5-fold cross-validation

@@ -19,4 +19,3 @@ class ShowCorrelationMatrixView:
         sns.heatmap(self.correlation_matrix, annot=True, cmap='coolwarm', fmt='.1f')
         plt.show()
         
-        

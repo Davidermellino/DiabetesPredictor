@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 class DecisionTreeSklearn:
-    def __init__(self, random_state=42, max_depth=11):
+    def __init__(self, random_state=0, max_depth=11):
         self.name = "DecisionTree"
         self.model = DecisionTreeClassifier(random_state=random_state, max_depth=max_depth)
     

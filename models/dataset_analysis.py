@@ -13,17 +13,9 @@ class DatasetAnalyzer:
         self.features = self.dataset.iloc[:, 1:] #Salva una matrix con tutti gli attributi
         self.label = self.dataset.iloc[:, 0] #Salva un array con le Labeò
         
-        sampler = Sampler(self.features, self.label) #Applica il Random Undersampling
-        self.features, self.label = sampler.randomSampler(self.features, self.label)
-        
+       
         self.dataset = recast_features(pd.concat([self.label, self.features], axis=1))
 
-        # scaler = Scaler(self.features)
-        # self.features = scaler.MinMaxScale(self.features)
-        
-        # feature_selection = FeatureSelection(self.features, self.label)
-        # self.features = feature_selection.featureSelection_Chi2(self.features, self.label)
-    
     def _compute_shape(self):
         
         #Seleziona le righe in base alla classe
@@ -80,7 +72,7 @@ class DatasetAnalyzer:
     
     def compute_correlation_matrix(self):
        
-        #TRASFOMO I DATI IN NUMERI
+      #TRASFOMO I DATI IN NUMERI
         le_sex = LabelEncoder()
         le_genhlth = LabelEncoder()
 
@@ -88,7 +80,7 @@ class DatasetAnalyzer:
         
         dataset_copy["Sex"] = le_sex.fit_transform(dataset_copy["Sex"])  # 'F' -> 0, 'M' -> 1
         dataset_copy["GenHlth"] = le_genhlth.fit_transform(dataset_copy["GenHlth"])  # Ordina da 'excellent' a 'poor'
-
+        
         return dataset_copy.iloc[:, 1:].corr()
 
                 
