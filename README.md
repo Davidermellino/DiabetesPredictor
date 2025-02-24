@@ -1,6 +1,6 @@
 # DiabetesPredictor
 
-A desktop application for analyzing and predicting diabetes using health data. The project is in its early stages and focuses on building the graphical interface and structuring the code.
+A desktop application for analyzing and predicting diabetes using health data. Features a modular architecture with machine learning models, preprocessing pipelines, and GUI views.
 
 ---
 
@@ -10,83 +10,95 @@ A desktop application for analyzing and predicting diabetes using health data. T
 │── assets/                          
 │   ├── img/                         
 │   │   └── logo.png                 
-│   └── logo.ico                     
+│   └── logo.ico
 │
-│── classifiers/                     
-│   └── (future models here)         
+│── models/
+│   ├──classifiers/
+│      ├── Artificial_neural_network_sklearn.py
+│      ├── Decision_tree_sklearn.py
+│      ├── Knn_Custom.py
+│      ├── Naive_bayes_sklearn.py
+│      └── Random_forest_custom.py
 │
-│── shared/                          
-│   ├── config.py                    
-│   ├── styles.py                    
-│   └── utils.py                     
+│   ├──preprocessing/
+│      ├── BestCombUnderOver.py
+│      ├── BestPreProcessingCombination.py
+│      ├── FeatureSelection.py
+│      ├── Sampler.py
+│      └── Scaler.py
 │
-│── views/                           
-│   ├── classifiers.py               
-│   ├── comparisons.py               
-│   ├── dataset_analysis.py          
-│   └── home.py                      
+│── shared/ 
+│   ├── config.py
+│   ├── constants.py
+│   ├── styles.py
+│   └── utils.py
 │
-│── app.py                           
-│── main.py                          
-│── README.md                        
-│── requirements.yml                 
+│── views/  
+│   ├── classifiers_view.py
+│   ├── compare_all_models_view.py
+│   ├── comparisons_view.py
+│   ├── dataset_analysis_view.py
+│   ├── home_view.py
+│   ├── performance_view.py
+│   ├── show_corr_matrix_view.py
+│   ├── show_dataset_statistics_view.py
+│   ├── show_feature_statistics_view.py
+│   ├── show_model_preProcessed_view.py
+│   └── show_models_compare_view.py
+│
+│── app.py
+│── main.py
+│── requirements.yml
 ```
 
----
+## **Key Components**  
 
-## **Description of Files and Folders**
+### 🔨 **`models/`**  
+- Machine learning implementations:  
+  - Scikit-learn integration ( Decision Tree, ANN, Naive Bayes ) 
+  - Custom algorithms (KNN, Random Forest)  
 
-### **`assets/`**
-Contains static resources such as images and icons used in the graphical interface. For example:
-- **`logo.ico`**: Application icon.
-- **`img/`**: Folder for additional images (e.g., application logo).
+### ⚙️ **`preprocessing/`**  
+- Data pipeline tools:  
+  - `FeatureSelection.py`: ANOVA, PCA  
+  - `Sampler.py`: SMOTE, RandomUnderSampler  
+  - `BestCombUnderOver.py`: Best Sampling Combination ( over and under ) 
 
-### **`classifiers/`**
-Folder reserved for machine learning models. Currently empty, but in the future, it will contain:
-- Code for training models.
-- Scripts for evaluating and saving models.
+### 🧩 **`shared/`**  
+- Core utilities:  
+  - `constants.py`: Paths and configurations  
+  - `styles.py`: Tkinter GUI styling  
+  - `utils.py`: Data loading helpers  
 
-### **`shared/`**
-Contains shared files used throughout the project:
-- **`config.py`**: Configuration constants such as window title, size, and icon path.
-- **`styles.py`**: Configures graphical styles for the interface using `ttk.Style`.
-
-### **`views/`**
-Each file in this folder represents a screen in the application:
-- **`home.py`**: Main page with a welcome message and logo.
-- **`dataset_analysis.py`**: Page for dataset analysis (to be implemented).
-- **`classifiers.py`**: Page for managing machine learning classifiers (to be implemented).
-- **`comparisons.py`**: Page for model comparisons (currently disabled).
-
-### **`app.py`**
-Contains the `MainApp` class, which manages the graphical interface and navigation between different screens. It handles:
-- Configuring the main window.
-- Initializing graphical styles.
-- Creating the sidebar with navigation buttons.
-- Switching between different screens.
-
-### **`main.py`**
-Application entry point. Creates the main window and starts the application.
-
-# Dataset
-Download the dataset from [this link](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset
-) and place it in the root directory of the project.
-
-### **`requirement.yml`**
-File specifying the project dependencies. It will be used to create a virtual environment with all the necessary libraries.
+### 🖥️ **`views/`**  
+- Interactive GUI screens:  
+  - `show_corr_matrix_view.py`: Heatmap visualizations  
+  - `performance_view.py`: Model metrics dashboard  
+  - `show_feature_statistics_view.py`: Distribution plots
+  - other views..
 
 ---
 
-## **How to Run the Project**
+## **Dataset Preparation**  
+1. Download from [Kaggle](https://www.kaggle.com/datasets/alexteboul/diabetes-health-indicators-dataset)  
+2. Save to project directory as:  
+   `diabetes_012_health_indicators_BRFSS2015`  
+
+---
+
+## **🚀 Installation**
 
 1. Clone the repository:
    ```bash
    git clone https://github.com/Davidermellino/DiabetesPredictor.git
 
-2. Create environment with conda ( optional )
+2. Go to project directory:
+    ```bash
+    cd path/to/project/directory  
 
+3. Create environment with conda ( optional ) or install all required package present on requirements.yml
    ```bash
      conda env create -f requirements.yml
-3. Run the program
+4. Run the program
    ```bash
      python ./main.py
