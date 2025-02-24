@@ -60,7 +60,7 @@ A desktop application for analyzing and predicting diabetes using health data. F
 
 ### ⚙️ **`preprocessing/`**  
 - Data pipeline tools:  
-  - `FeatureSelection.py`: ANOVA, PCA  
+  - `FeatureSelection.py` 
   - `Sampler.py`: SMOTE, RandomUnderSampler  
   - `BestCombUnderOver.py`: Best Sampling Combination ( over and under ) 
 
